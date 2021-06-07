@@ -15,6 +15,7 @@ namespace Kbg.NppPluginNET
     {
         internal const string PluginName = "Discord Rich Presence";
         static string iniFilePath = null;
+        static Thread thread;
         static preferencesDlg prfsDlg = null;
         static DiscordRpcClient client = null;
         static int idMyDlg = -1;
@@ -61,12 +62,18 @@ namespace Kbg.NppPluginNET
             Marshal.StructureToPtr(tbIcons, pTbIcons, false);
             Win32.SendMessage(PluginBase.nppData._nppHandle, (uint) NppMsg.NPPM_ADDTOOLBARICON, PluginBase._funcItems.Items[idMyDlg]._cmdID, pTbIcons);
             Marshal.FreeHGlobal(pTbIcons);
+            Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_SETMENUITEMCHECK, PluginBase._funcItems.Items[idMyDlg]._cmdID, isStarted ? 1 : 0);
+
         }
 
         internal static void PluginCleanUp()
         {
-            if (client != null)
+            if (client != null && !client.IsDisposed)
+            {
+                stopRefresh = true;
+                thread.Abort();
                 client.Dispose();
+            }
         }
 
         static void callbackWhatIsNpp(object data)
@@ -116,15 +123,15 @@ namespace Kbg.NppPluginNET
         {
             if (!isStarted)
             {
-                Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_SETMENUITEMCHECK, PluginBase._funcItems.Items[idMyDlg]._cmdID, 1);
-                new Thread(new ParameterizedThreadStart(callbackWhatIsNpp)).Start(null);
+                thread = new Thread(new ParameterizedThreadStart(callbackWhatIsNpp));
+                thread.Start(null);
                 isStarted = true;
             }
             else
             {
-                Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_SETMENUITEMCHECK, PluginBase._funcItems.Items[idMyDlg]._cmdID, 0);
                 stopRefresh = true;
             }
+            Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_SETMENUITEMCHECK, PluginBase._funcItems.Items[idMyDlg]._cmdID, isStarted ? 1 : 0);
         }
 
         internal static void startFunction()
