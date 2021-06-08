@@ -2,6 +2,11 @@
 
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/MikeCoder96/NotePad-Discord-Rich-Presence-Plugin/issues)
 
+| Architecture | Tested |
+| ------ | ------ |
+| x64 | Yes |
+| x86 | No |
+
 ### How to use?
 - Compile
 - Copy DiscordRPC.dll and Newtonsoft.Json.dll
