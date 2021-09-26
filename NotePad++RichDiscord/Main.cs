@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -27,7 +28,7 @@ namespace Kbg.NppPluginNET
         static INotepadPPGateway notepad = new NotepadPPGateway();
 
         public static void OnNotification(ScNotification notification)
-        {  
+        {
             // This method is invoked whenever something is happening in notepad++
             // use eg. as
             // if (notification.Header.Code == (uint)NppMsg.NPPN_xxx)
@@ -41,9 +42,9 @@ namespace Kbg.NppPluginNET
         internal static void CommandMenuInit()
         {
             StringBuilder sbIniFilePath = new StringBuilder(Win32.MAX_PATH);
-            Win32.SendMessage(PluginBase.nppData._nppHandle, (uint) NppMsg.NPPM_GETPLUGINSCONFIGDIR, Win32.MAX_PATH, sbIniFilePath);
+            Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_GETPLUGINSCONFIGDIR, Win32.MAX_PATH, sbIniFilePath);
             iniFilePath = sbIniFilePath.ToString();
-            if (!Directory.Exists(iniFilePath)) 
+            if (!Directory.Exists(iniFilePath))
                 Directory.CreateDirectory(iniFilePath);
             iniFilePath = Path.Combine(iniFilePath, PluginName + ".ini");
             autoStart = (Win32.GetPrivateProfileInt("settings", "autostart", 0, iniFilePath) != 0);
@@ -60,7 +61,7 @@ namespace Kbg.NppPluginNET
             tbIcons.hToolbarBmp = tbBmp.GetHbitmap();
             IntPtr pTbIcons = Marshal.AllocHGlobal(Marshal.SizeOf(tbIcons));
             Marshal.StructureToPtr(tbIcons, pTbIcons, false);
-            Win32.SendMessage(PluginBase.nppData._nppHandle, (uint) NppMsg.NPPM_ADDTOOLBARICON, PluginBase._funcItems.Items[idMyDlg]._cmdID, pTbIcons);
+            Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_ADDTOOLBARICON, PluginBase._funcItems.Items[idMyDlg]._cmdID, pTbIcons);
             Marshal.FreeHGlobal(pTbIcons);
             Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_SETMENUITEMCHECK, PluginBase._funcItems.Items[idMyDlg]._cmdID, isStarted ? 1 : 0);
 
@@ -70,38 +71,70 @@ namespace Kbg.NppPluginNET
         {
             if (client != null && !client.IsDisposed)
             {
-                stopRefresh = true;
                 thread.Abort();
+                client.ClearPresence();
                 client.Dispose();
             }
         }
 
-        static void callbackWhatIsNpp(object data)
+        static void callbackStartDiscordRichPresence(object data)
         {
-            client = new DiscordRpcClient("529306098646122516");
-
+            client = new DiscordRpcClient("529306098646122516");           
             client.Initialize();
+
+            Thread.Sleep(2000);
+            StringBuilder sbFieldValue = new StringBuilder(32767);
+            Win32.GetPrivateProfileString("settings", "excludelist", "", sbFieldValue, 32767, iniFilePath);
+            var excludeList_tmp = sbFieldValue.ToString().Split('|');
+            var excludeList = excludeList_tmp.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            
+            var fileName = getCurrentPath(NppMsg.FILE_NAME);
+            var actualFile = "";
+            if (excludeList.Contains(fileName))
+                fileName = "Secret File";
+
+            client.SetPresence(new RichPresence()
+            {
+                Details = "Working on file:",
+                State = fileName,
+                Assets = new Assets()
+                {
+                    LargeImageKey = "image_large",
+                    LargeImageText = "Notepad++",
+                    SmallImageKey = "image_small"
+                }
+            });
+
             while (true)
             {
-                Thread.Sleep(2000);
+                Thread.Sleep(800);
                 if (stopRefresh)
                 {
                     client.Dispose();
                     stopRefresh = false;
                     break;
-                }    
-                var fileName = getCurrentPath(NppMsg.FILE_NAME);
-                client.SetPresence(new RichPresence()
+                }
+
+                fileName = getCurrentPath(NppMsg.FILE_NAME);
+  
+                Win32.GetPrivateProfileString("settings", "excludelist", "", sbFieldValue, 32767, iniFilePath);
+                excludeList_tmp = sbFieldValue.ToString().Split('|');
+                excludeList = excludeList_tmp.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+                if (excludeList.Contains(fileName))
                 {
-                    Details = "Working on file:",
-                    State = fileName,
-                    Assets = new Assets()
-                    {
-                        LargeImageKey = "image_large",
-                        LargeImageText = "Notepad++",
-                        SmallImageKey = "image_small"
-                    }
-                });
+                    if (actualFile != fileName)
+                        client.UpdateState("Secret File");
+                    actualFile = fileName;
+                    continue;
+                }
+
+
+                if (actualFile != fileName)
+                {
+                    actualFile = fileName;
+                    client.UpdateState(fileName);
+                }
             }
         }
 
@@ -123,7 +156,7 @@ namespace Kbg.NppPluginNET
         {
             if (!isStarted)
             {
-                thread = new Thread(new ParameterizedThreadStart(callbackWhatIsNpp));
+                thread = new Thread(new ParameterizedThreadStart(callbackStartDiscordRichPresence));
                 thread.Start(null);
                 isStarted = true;
             }
@@ -168,11 +201,11 @@ namespace Kbg.NppPluginNET
                 IntPtr _ptrNppTbData = Marshal.AllocHGlobal(Marshal.SizeOf(_nppTbData));
                 Marshal.StructureToPtr(_nppTbData, _ptrNppTbData, false);
 
-                Win32.SendMessage(PluginBase.nppData._nppHandle, (uint) NppMsg.NPPM_DMMREGASDCKDLG, 0, _ptrNppTbData);
+                Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_DMMREGASDCKDLG, 0, _ptrNppTbData);
             }
             else
             {
-                Win32.SendMessage(PluginBase.nppData._nppHandle, (uint) NppMsg.NPPM_DMMSHOW, 0, prfsDlg.Handle);
+                Win32.SendMessage(PluginBase.nppData._nppHandle, (uint)NppMsg.NPPM_DMMSHOW, 0, prfsDlg.Handle);
             }
         }
     }
