@@ -23,5 +23,6 @@ Notepad++ Rich Presence Plugin is currently extended with the following NuGet ex
 | NuGet Package | WebPage |
 | ------ | ------ |
 | DiscordRPC | [https://github.com/Lachee/discord-rpc-csharp] |
+| Newtonsoft Json | [https://github.com/JamesNK/Newtonsoft.Json] |
 
 
