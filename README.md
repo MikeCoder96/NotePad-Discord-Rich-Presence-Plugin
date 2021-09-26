@@ -5,7 +5,7 @@
 | Architecture | Tested |
 | ------ | ------ |
 | x64 | Yes |
-| x86 | No |
+| x86 | Yes |
 
 ### How to use?
 - Compile
