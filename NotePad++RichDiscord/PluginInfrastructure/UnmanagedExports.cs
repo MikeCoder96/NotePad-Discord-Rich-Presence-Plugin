@@ -33,7 +33,7 @@ namespace Kbg.NppPluginNET
                     return null;
                 }
 
-                string absoluteFolder = new FileInfo((new System.Uri(Assembly.GetExecutingAssembly().CodeBase)).LocalPath).Directory.FullName + "\\Lib";
+                string absoluteFolder = new FileInfo((new System.Uri(Assembly.GetExecutingAssembly().CodeBase)).LocalPath).Directory.FullName;
                 string targetPath = Path.Combine(absoluteFolder, assemblyFile);
 
                 try
@@ -90,7 +90,7 @@ namespace Kbg.NppPluginNET
             if (notification.Header.Code == (uint)NppMsg.NPPN_TBMODIFICATION)
             {
                 PluginBase._funcItems.RefreshItems();
-                Main.SetToolBarIcon();
+                Main.refreshCheckbox();
             }
             else if (notification.Header.Code == (uint)NppMsg.NPPN_SHUTDOWN)
             {

@@ -33,7 +33,7 @@ namespace Kbg.NppPluginNET
 
             StringBuilder sbFieldValue = new StringBuilder(32767);
             Win32.GetPrivateProfileString("settings", "autostart", "", sbFieldValue, 32767, path);
-            if (int.Parse(sbFieldValue.ToString()) == 1)
+            if (sbFieldValue.ToString() != "" && int.Parse(sbFieldValue.ToString()) == 1)
                 checkBox1.Checked = true;
 
             Win32.GetPrivateProfileString("settings", "excludelist", "", sbFieldValue, 32767, path);
