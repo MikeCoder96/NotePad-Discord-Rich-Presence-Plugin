@@ -9,12 +9,17 @@
 
 ### How to use?
 - Compile
-- Copy DiscordRPC.dll and Newtonsoft.Json.dll
+- Copy NotePad++RichDiscord.dll
 - Go to Notepad++ plugin folder and locate NotePad++RichDiscord Folder
-- Inside create Lib folder and paste the 2 dll quoted above
+- Paste inside NotePad++RichDiscord Folder the file NotePad++RichDiscord.dll
+- Copy DiscordRPC.dll and Newtonsoft.Json.dll (this two files come when you compile the solution, check bin folder)
+- Paste the 2 dll quoted above inside NotePad++RichDiscord Folder
 
 ## How to debug?
-You need to follow instruction above, after you can simple start the plugin from Visual Studio
+You have to set right path inside solution. 
+- Open solution manager
+- Inside Debug tab, set (start external program) and select notepad++.exe
+- Inside Build tab, set (output path) to NotePad++RichDiscord Folder "Example: C:/Program File/Notepad++/plugin/NotePad++RichDiscord"
 
 ### NuGet Packages
 
