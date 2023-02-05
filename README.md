@@ -14,6 +14,7 @@
 - Paste inside NotePad++RichDiscord Folder the file NotePad++RichDiscord.dll
 - Copy DiscordRPC.dll and Newtonsoft.Json.dll (this two files come when you compile the solution, check bin folder)
 - Paste the 2 dll quoted above inside NotePad++RichDiscord Folder
+- Open Notepad++ and go in Plugins->Discord Rich Presence and press to Run Rich Presence Discord
 
 ## How to debug?
 You have to set right path inside solution. 
