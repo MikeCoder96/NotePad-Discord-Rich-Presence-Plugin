@@ -55,7 +55,7 @@ namespace Kbg.NppPluginNET
             iniFilePath = Path.Combine(iniFilePath, PluginName + ".ini");
             autoStart = (Win32.GetPrivateProfileInt("settings", "autostart", 0, iniFilePath) != 0);
 
-            PluginBase.SetCommand(0, "Start Rich Presence Discord", startFunction, new ShortcutKey(false, false, false, Keys.None)); idMyDlg = 0;
+            PluginBase.SetCommand(0, "Run Rich Presence Discord", startFunction, new ShortcutKey(false, false, false, Keys.None)); idMyDlg = 0;
             PluginBase.SetCommand(1, "Preferences", myDockableDialog);
             if (autoStart)
                 executePresence();
